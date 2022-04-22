@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 import numpy as np
 import logging
 import pickle
@@ -6,14 +7,14 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 import tensorflow as tf
 import time
 import config
-from src.dataset import get_data, get_features_targets, split_data, extract_most_important_features, \
+from Strategy_ml.src.dataset import get_data, get_features_targets, split_data, extract_most_important_features, \
     create_flatten_features, create_lstm_features, prepare_data
-from src.logger import setup_logger
-from src.models import BiLSTMModel, LightGBMModel, evaluate
-from src.preprocess import get_processed_data, create_balanced_data
+from Strategy_ml.src.logger import setup_logger
+from Strategy_ml.src.models import BiLSTMModel, LightGBMModel, evaluate
+from Strategy_ml.src.preprocess import get_processed_data, create_balanced_data
 
 
-log = setup_logger(out_file=f'./logs/{config.TARGET}_training_{str(time.time())}.txt', stderr_level=logging.INFO)
+log = setup_logger(out_file= f'./logs/{config.TARGET}_training_{str(time.time())}.txt', stderr_level=logging.INFO)
 log.info(f"{config.model_parameters}.")
 scaler = StandardScaler()
 le = LabelEncoder()
@@ -119,3 +120,4 @@ if __name__ == '__main__':
             model.save()
             model_save_path = f'./{config.MODELS_FOLDER}/{config.TARGET}/lgb_{i}_{str(config.TARGET)}.txt'
             log.info(f"Saving features names to {model_save_path} for future use of {i} currency.")
+

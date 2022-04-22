@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, StandardScaler, OneHotEncoder
 
 from Strategy_ml import config
-from logger import LOGGER
+from Strategy_ml.src.logger import LOGGER
 
 
 def fill_nan(train_df, exc_feat, is_train=True, means_dir=None):

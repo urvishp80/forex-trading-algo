@@ -1,4 +1,5 @@
-from logger import LOGGER
+from Strategy_ml.src.logger import LOGGER
+from Strategy_ml.config import SAVE_MATRIX_DETAIL, BASE_PATH
 import abc
 import json
 import os
@@ -13,6 +14,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 all_score_dict = {}
+
 
 def multiclass_roc_auc_score(y_test, y_pred, average="weighted"):
     lb = LabelBinarizer()
@@ -34,13 +36,13 @@ class LightGBMModel:
         self.currency = currency
 
         if self.inference:
-            self._model = self.load(f'./{self.config.MODELS_FOLDER}/{self.config.TARGET}/lgb_{self.currency}_{str(self.config.TARGET)}.txt')
+            self._model = self.load(f'{self.config.MODELS_FOLDER}/{self.config.TARGET}/lgb_{self.currency}_{str(self.config.TARGET)}.txt')
         else:
             self._model = None   # if self.config.saved_path is None else self.load(self.load(self.config.saved_path))
 
     def save(self):
         os.makedirs(f'{self.config.MODELS_FOLDER}/{self.config.TARGET}/', exist_ok=True)
-        model_save_path = f'./{self.config.MODELS_FOLDER}/{self.config.TARGET}/lgb_{self.currency}_{str(self.config.TARGET)}.txt'
+        model_save_path = f'{self.config.MODELS_FOLDER}/{self.config.TARGET}/lgb_{self.currency}_{str(self.config.TARGET)}.txt'
         self._model.save_model(model_save_path)
         self.logger.info('Saved model to {}'.format(model_save_path))
 
@@ -79,13 +81,13 @@ class LightGBMModel:
         preds_2d = self._model.predict(features)
         # preds_prob = self._model.predict_proba(features)
         # print(preds_prob.shape)
-        print(preds_2d.shape[1])
+        # print(preds_2d.shape[1])
         preds = np.array([np.argmax(i) for i in preds_2d])
         preds = preds.reshape(-1,1)
-        print(f"value counts of prediction:- {np.unique(preds, return_counts=True)}")
-        print(f"value counts of actual label:- {np.unique(labels, return_counts=True)}")
-        print(labels.shape)
-        print(preds.shape)
+        # print(f"value counts of prediction:- {np.unique(preds, return_counts=True)}")
+        # print(f"value counts of actual label:- {np.unique(labels, return_counts=True)}")
+        # print(labels.shape)
+        # print(preds.shape)
 
         # preds = np.where(preds > 0.35, 1, 0)
         labels1 = np.arange(preds_2d.shape[1])
@@ -102,7 +104,7 @@ class LightGBMModel:
         all_score_dict[f"Precision score at the time of {type} of {self.currency} is"] = round(precision,4)
         all_score_dict[f"Recall score at the time of {type} of {self.currency} is"] = round(recall,4)
 
-        with open('./data/all_score_dict.json', 'w') as fp:
+        with open(SAVE_MATRIX_DETAIL, 'w') as fp:
             json.dump(all_score_dict, fp)
 
         self.logger.info(f"AUC score at the time of {type} of {self.currency} model is {round(auc, 4)}.")

@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from Strategy_ml import config
-from logger import LOGGER
-from indicators import get_indicators, get_price_patterns, get_additional_indicators
+from Strategy_ml.src.logger import LOGGER
+from Strategy_ml.src.indicators import get_indicators, get_price_patterns, get_additional_indicators
 
 
 def prepare_data(df):
@@ -25,6 +25,8 @@ def prepare_data(df):
 
 def get_data(path, drop_col=None):
     df = pd.read_csv(path)
+    if ("completed" and "volume") in df.columns:
+        df = df.drop(["completed", "volume"], axis=1)
     df['Date'] = pd.to_datetime(df['timestamp'])
     print(df['Date'][0])
     # df['Date'] = pd.to_datetime(df['Date'], unit='ms')

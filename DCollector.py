@@ -117,6 +117,8 @@ class stockDownload:
                       print(InstrumentsCandlesFactory, OUTPUT)
                 except Exception as e:
                     from oandapyV20.exceptions import V20Error # Most likely required
+                    code = "400"
+                    msg = e
                     error = V20Error(code, msg) # oandapyV20.V20Error(code, msg)
                     print ('Oanda Error: ', error)
                     print('{} not available. \n Please check your internet connection'.format(self.instrument))
@@ -140,14 +142,18 @@ class Runcollector:
     def loadData(self):
         from threading import Thread
         threads = []
-        for instr in self.path['instruments'].split(','):
-            threads.append(Thread(target = stockDownload, args = (self.path, instr, self.start,
-                                                                                   self.end, self.client, self.timeframe)))
-        for trd in threads:
-            trd.daemon = True
-            trd.start()
-        for st_trd in threads:
-            st_trd.join()
+        if len(self.path['instruments']) == 1:
+            self.path['instruments']
+        else:
+            # for instr in self.path['instruments']:
+            for instr in self.path['instruments'].split(','):
+                threads.append(Thread(target = stockDownload, args = (self.path, instr, self.start,
+                                                                                       self.end, self.client, self.timeframe)))
+            for trd in threads:
+                trd.daemon = True
+                trd.start()
+            for st_trd in threads:
+                st_trd.join()
                 
     def runnewMain(self):
         import time
@@ -161,7 +167,7 @@ class Runcollector:
 #             'acountPath': 'DOCS\\account_id.txt',
 #             'tokenPath': 'DOCS\\token_live.txt',
 #             'tokenPath_pract': 'DOCS\\token_pract.txt',
-#             'telegram': 'DOCS\\telegram.txt',
+#             'telegram': 'DOCS\\telegram_client.txt',
 #             'predicted': 'PREDICTED',
 #             'signals': 'SIGNALS',
 #             'start': str((datetime.datetime.utcnow() - datetime.timedelta(days=730)).isoformat('T')[:-7] + 'Z'),

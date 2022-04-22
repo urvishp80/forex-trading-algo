@@ -1150,15 +1150,15 @@ class Run(Runcollector):
             with open(os.path.join(self.path['mainPath'], self.path['tokenPath_pract'])) as tk:
                 token = tk.readline().strip()
                 self.client = API(access_token = token, environment=self.path['environment'])
-        for i in self.STOCKLIST:
-            STOCK = i
-            print(STOCK)
+        # for i in self.STOCKLIST:
+        #     STOCK = i
+        #     print(STOCK)
             # print(STOCK)
-            datapath = join(self.path['mainPath'], 'DATASETS\\{}\\'.format(STOCK))
-            print(os.path.isfile(join(datapath, STOCK + '_{}'.format(TIMEFRAME) + str('.csv'))))
-            if not os.path.isfile(join(datapath, STOCK + '_{}'.format(TIMEFRAME) + str('.csv'))):
-                Path(self.path)
-                super().__init__(self.path, self.path['start'], self.path['end'], self.client, self.TIMEFRAME)
+            # datapath = join(self.path['mainPath'], 'DATASETS\\{}\\'.format(STOCK))
+            # print(os.path.isfile(join(datapath, STOCK + '_{}'.format(TIMEFRAME) + str('.csv'))))
+            # if not os.path.isfile(join(datapath, STOCK + '_{}'.format(TIMEFRAME) + str('.csv'))):
+        Path(self.path)
+        super().__init__(self.path, self.path['start'], self.path['end'], self.client, self.TIMEFRAME)
         
         try:
             if self.STOCKLIST is None:
@@ -1224,7 +1224,7 @@ if __name__ == '__main__':
             'acountPath': 'DOCS\\account_id.txt',
             'tokenPath': 'DOCS\\token_live.txt',
             'tokenPath_pract': 'DOCS\\token_pract.txt',
-            'telegram': 'DOCS\\telegram.txt',
+            'telegram': 'DOCS\\telegram_client.txt',
             'predicted': 'PREDICTED',
             'signals': 'SIGNALS',
             'start': str((dt.datetime.utcnow() - dt.timedelta(days=730)).isoformat('T')[:-7] + 'Z'),

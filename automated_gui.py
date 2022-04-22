@@ -5,6 +5,7 @@ Created on Sat May 25 02:21:40 2019
 
 @author: kenneth
 """
+
 import time
 from STOCK import stock
 import os
@@ -109,6 +110,7 @@ class telegramBot(object):
             token, chatID = tgt.readlines()
         token = token.strip()
         chatID = chatID.strip()
+        print(chatID)
         bot = telegram.Bot(token=token)
         texts=[]
         text = '<b> ✅✅✅✅ AI SIGNAL GENERATOR I.Q.T. (Intelligent QuanTrader)✅✅✅✅ </b>\n\n'
@@ -174,6 +176,7 @@ class telegramBot(object):
                             text+=temp_text
 
         texts.append(text)
+        print(texts)
         for text in texts:
             bot.send_message(chat_id=chatID, text=text,
                              parse_mode=telegram.ParseMode.HTML)
@@ -264,13 +267,15 @@ class streamSignal(ttk.Frame):
         timeframe = tk.Label(frameTF, text='TimeFrame').grid(row=1, column=4)
         self.timeframeEntry = ttk.Combobox(frameTF, values=self.path['timeframes'], width=8)
         self.timeframeEntry['state'] = 'readonly'
-        self.timeframeEntry.current(2)
+        self.timeframeEntry.current(0)
+        # self.timeframeEntry.current(2)
         self.timeframeEntry.grid(row=1, column=5, padx=10, pady=5)
         self.timeframeEntry.bind("<<ComboboxSelected>>", self.callback)
         time = tk.Label(frameTF, text='Timer').grid(row=2, column=4, padx=10, pady=5)
         self.timeEntry = ttk.Combobox(frameTF, values=self.path['timeframes'], width=8)
         self.timeEntry['state'] = 'readonly'
-        self.timeEntry.current(1)
+        self.timeEntry.current(0)
+        # self.timeEntry.current(1)
         self.timeEntry.grid(row=2, column=5, padx=10, pady=5)
         self.timeEntry.bind("<<ComboboxSelected>>", self.callback)
         frameTF.grid(row=1, column=5, padx=10, pady=10)
@@ -292,10 +297,16 @@ class streamSignal(ttk.Frame):
         self.pairs = self.path['instruments'].split(',')
         openPositions = []
         for st in self.pairs:
+            # print(os.path.join(self.path['mainPath'],f"{self.path['predicted']}\\STRATEGY_{self.strategyEntry.get()}\\{self.timeframe}\\{st}" + ".csv"))
             data = pd.read_csv(os.path.join(self.path['mainPath'],
                                             f"{self.path['predicted']}\\STRATEGY_{self.strategyEntry.get()}\\{self.timeframe}\\{st}" + ".csv"))
             stockData = stock(data)
             data['ATR'] = stockData.ATR(data, int(self.periodEntry.get()))
+            # print(data)
+            # position = data.Position[0]
+            # time = data.timestamp[0]
+            # close = data.Close[0]
+            # atrVal = data.ATR[0]
             position = data.Position[0]
             time = data.timestamp[0]
             close = data.Close[0]
@@ -345,24 +356,28 @@ class streamSignal(ttk.Frame):
             # append result: Store in database & pass to GUI
             openPositions.append([st, position, time, close, tp1, tp2, tp3, sl])
         columns = ['pair', 'position', 'time', 'close', 'tp1', 'tp2', 'tp3', 'sl']
-        if not os.path.exists(os.path.join(path['mainPath'], path['signals'] + '\\signals.csv')):
+        if not os.path.exists(os.path.join(path['mainPath'], path['signals'] + '\\signals_old_gui.csv')):
             signal = pd.DataFrame(openPositions, columns=columns)
-            signal.to_csv(os.path.join(path['mainPath'], path['signals'] + '\\signals.csv'))
+            signal.to_csv(os.path.join(path['mainPath'], path['signals'] + '\\signals_old_gui.csv'))
             # --Return telegram
             telegramBot(self.path).tgsignal(signal)
         else:
-            oldSignal = pd.read_csv(os.path.join(path['mainPath'], path['signals'] + '\\signals.csv')).iloc[:, 1:]
+            oldSignal = pd.read_csv(os.path.join(path['mainPath'], path['signals'] + '\\signals_old_gui.csv')).iloc[:, 1:]
+            print(f"oldsignal:{oldSignal}")
             newSignal = pd.DataFrame(openPositions, columns=columns)
             if oldSignal['position'].equals(newSignal['position']):
+                print("I think this is going in same old and update signal")
                 pass
             else:
-                newSignal['update'] = np.where(oldSignal['position'] == newSignal['position'], np.nan,
+                newSignal['update'] = np.where(oldSignal['position'].sort_index(inplace=True) == newSignal['position'].sort_index(inplace=True), np.nan,
                                                newSignal.position)
                 updateSignal = newSignal.dropna().drop(['update'], axis=1)
                 newSignal.drop(['update'], axis=1, inplace=True)
-                newSignal.to_csv(os.path.join(path['mainPath'], path['signals'] + '\\signals.csv'))
+                newSignal.to_csv(os.path.join(path['mainPath'], path['signals'] + '\\signals_old_gui.csv'), index=False)
                 # --Return telegram
-                telegramBot(self.path).tgsignal(updateSignal)
+                print(f"updatesignal {updateSignal}")
+                if len(updateSignal) > 0:
+                    telegramBot(self.path).tgsignal(updateSignal)
         return openPositions
 
     def signalGUI(self):
@@ -542,7 +557,9 @@ class streamSignal(ttk.Frame):
         elif self.timer == 'D1':
             self.time = 86400000
         else:
-            self.time = 900000
+            # self.time = 900000
+            self.time = 120000
+
         self.signalGUI()
 
         # Scheduler to generate and broadcast new trade signals without delay
@@ -574,7 +591,8 @@ class streamSignal(ttk.Frame):
         elif self.timeframe == 'D1':
             self.timeframe_ms = 86400000
         else:
-            self.timeframe_ms = 900000
+            # self.timeframe_ms = 900000
+            self.timeframe_ms = 120000
 
         print('Timeframe in ms: ')
         print(self.timeframe_ms)
@@ -743,7 +761,8 @@ class Returns(ttk.Frame):
         # timeframe frame
         timframe = tk.Label(optionFrame, text='Timeframe').grid(row=1, column=2)
         self.timeOption = ttk.Combobox(optionFrame, values=self.path['timeframes'], state='readonly')
-        self.timeOption.current(2)
+        self.timeOption.current(0)
+        # self.timeOption.current(2)
         self.timeOption.focus()
         self.timeOption.grid(row=1, column=3, padx=20, pady=10)
         self.timeOption.bind("<<ComboboxSelected>>", self.callback)
@@ -2116,7 +2135,8 @@ class visu(ttk.Frame):
         # timeframe frame
         timframe = tk.Label(optionFrame, text='Timeframe').grid(row=1, column=4)
         self.timeOption = ttk.Combobox(optionFrame, values=self.path['timeframes'], state='readonly')
-        self.timeOption.current(2)
+        self.timeOption.current(0)
+        # self.timeOption.current(2)
         self.timeOption.focus()
         self.timeOption.bind("<<ComboboxSelected>>", self.callback)
         self.timeOption.grid(row=1, column=5, padx=20, pady=10)
@@ -2953,13 +2973,17 @@ if __name__ == '__main__':
     print('Get current filepath', current_directory)
     # Original file path example: 'C:\\Users\\58412\\Documents\\ai\\AI-Signal-Generator'
     path = {'mainPath': str(current_directory),
+            # 'acountPath': 'E:/urvish forex/intelligent-quantrader/DOCS/account_id.txt',
             'acountPath': 'DOCS\\account_id.txt',
+            # 'tokenPath': 'E:/urvish forex/intelligent-quantrader/DOCS/token_live.txt',
             'tokenPath': 'DOCS\\token_live.txt',
+            # 'tokenPath_pract': 'E:/urvish forex/intelligent-quantrader/DOCS/token_pract.txt',
             'tokenPath_pract': 'DOCS\\token_pract.txt',
+            # 'telegram': 'E:/urvish forex/intelligent-quantrader/DOCS/telegram.txt',
             'telegram': 'DOCS\\telegram.txt',
             'predicted': 'PREDICTED',
             'signals': 'SIGNALS',
-            'start': str((datetime.datetime.utcnow() - datetime.timedelta(days=30)).isoformat('T')[:-7] + 'Z'),
+            'start': str((datetime.datetime.utcnow() - datetime.timedelta(days=2)).isoformat('T')[:-7] + 'Z'),
             # '2019-10-03T00:00:00Z', # I changed this from match to oct
             'end': str(datetime.datetime.utcnow().isoformat('T')[:-7] + 'Z'),
             'environment': 'live',
@@ -2968,8 +2992,9 @@ if __name__ == '__main__':
                          '222', '333', '444', '555', '666', '777', '888', '999', '1111',
                          '2222', '3333', '4444', '5555', '6666', '7777', '8888'],
             'instruments': 'AUD_USD,BCO_USD,BTC_USD,DE30_EUR,EUR_AUD,EUR_JPY,EUR_USD,GBP_JPY,GBP_USD,NAS100_USD,SPX500_USD,US30_USD,USD_CAD,USD_JPY,XAU_USD',
-            'timeframes': ['M15', 'M30', 'H1', 'H2', 'H3', 'H4', 'H6', 'H8',
+            'timeframes': ['M2','M30','H1', 'H2', 'H3', 'H4', 'H6', 'H8',
                            'H12', 'D', 'W']}
+            # 'timeframes': ['M30']}
     print('end time:')
     print(path['end'])
 
