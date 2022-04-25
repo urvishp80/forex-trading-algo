@@ -105,6 +105,7 @@ class stockDownload:
             #     f.close()
             with open(self.path['mainPath'] + '\\DATASETS\\{}\\{}_{}.csv'.format(self.instrument, self.instrument, self.timeframe), 'w') as OUTPUT:
                 # OUTPUT.write(header + "\n")
+                print("opening csv file and appending in that")
                 params = {'from': self.start,
                           'to': self.end,
                           'granularity': self.timeframe,
@@ -142,19 +143,20 @@ class Runcollector:
     def loadData(self):
         from threading import Thread
         threads = []
-        if len(self.path['instruments']) == 1:
-            self.path['instruments']
-        else:
-            # for instr in self.path['instruments']:
-            for instr in self.path['instruments'].split(','):
-                threads.append(Thread(target = stockDownload, args = (self.path, instr, self.start,
-                                                                                       self.end, self.client, self.timeframe)))
-            for trd in threads:
-                trd.daemon = True
-                trd.start()
-            for st_trd in threads:
-                st_trd.join()
-                
+        # if len(self.path['instruments']) == 1:
+        #     self.path['instruments']
+        # else:
+        for instr in self.path['instruments']:
+            print(instr)
+        # for instr in self.path['instruments'].split(','):
+            threads.append(Thread(target = stockDownload, args = (self.path, instr, self.start,
+                                                                                   self.end, self.client, self.timeframe)))
+        for trd in threads:
+            trd.daemon = True
+            trd.start()
+        for st_trd in threads:
+            st_trd.join()
+
     def runnewMain(self):
         import time
         return self.loadData()
