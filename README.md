@@ -21,5 +21,6 @@ ML Model based on trading strategy for forex trading
    - main.py for training the model.
    - Done your model will be saved in weights folder.
  4) Inference
+   - You can update yours telegram credential in DOCS/telegram.txt
    - automated_gui_ml.py for getting GUI + Telegram messages in that you can change the parameter like (time, timeframe and currency)
    -  automated_gui.py for running old gui 
