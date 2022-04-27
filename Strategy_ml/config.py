@@ -9,10 +9,11 @@ from Strategy_ml.src.utils import get_models_path
 # FILE_NAME = 'AUD_USD_train.csv'
 # CURRENCY_NAME = FILE_NAME.split("_train")[0]
 # DATA_PATH = os.path.join(DATA_FOLDER, FILE_NAME)
-BASE_PATH = "E:/urvish forex/forex-traading-algo"
+BASE_PATH = os.getcwd()
+# BASE_PATH = "E:/urvish forex/forex-traading-algo"
 
-MODELS_FOLDER = BASE_PATH + '/Strategy_ml/weights/'
-DATA_FOLDER = BASE_PATH + '/train_test_data/'
+MODELS_FOLDER = os.path.join(BASE_PATH, 'Strategy_ml\\weights')
+DATA_FOLDER = os.path.join(BASE_PATH,'train_test_data')
 # DATA_FOLDER = os.getcwd() +'\\train_test_data'
 FILE_NAME = []
 DATA_PATH = []
@@ -28,7 +29,7 @@ for i in os.listdir(DATA_FOLDER):
         TEST_DATA.append(i)
         TEST_DATA_PATH.append(os.path.join(DATA_FOLDER, i))
 
-SAVE_MATRIX_DETAIL = BASE_PATH + '/Strategy_ml/data/all_score_dict.json'
+SAVE_MATRIX_DETAIL = os.path.join(BASE_PATH,'Strategy_ml\\data\\all_score_dict.json')
 
 # test data
 # TEST_DATA = 'AUD_USD_unseen.csv'
@@ -44,7 +45,7 @@ DROP_COLS = ['timestamp']
 INTERVALS = (5, 15, 30, 60, 100)
 
 # path to save feature names for future use
-feature_save_path = BASE_PATH + f'/Strategy_ml/data./feature_names_{TARGET}.pkl'
+feature_save_path = os.path.join(BASE_PATH,f'Strategy_ml\\data\\feature_names_{TARGET}.pkl')
 
 # feature selection threshold
 fe_threshold = 0.3
@@ -92,8 +93,8 @@ neg_samples_factor = 1
 # previous context
 n_context = 15
 
-model_save_path = BASE_PATH + f'/Strategy_ml/{MODELS_FOLDER}/{TARGET}/lgb_{str(TARGET)}.txt'
-saved_path = BASE_PATH + f'/Strategy_ml/{MODELS_FOLDER}/{TARGET}/lgb_{str(TARGET)}.txt'
+model_save_path = os.path.join(BASE_PATH, f'Strategy_ml\\{MODELS_FOLDER}\\{TARGET}\\lgb_{str(TARGET)}.txt')
+saved_path = os.path.join(BASE_PATH, f'Strategy_ml\\{MODELS_FOLDER}\\{TARGET}\\lgb_{str(TARGET)}.txt')
 
 # Use LSTM
 use_lstm = False
@@ -114,11 +115,8 @@ test_fe_names = ['MOM_100', 'RSI_5', 'AROON_up_60', 'AROON_down_15', 'AROONU_14'
 # for blending models on test and validation data
 ensemble = False
 
-if ensemble:
-    models_path_list = get_models_path(
-        BASE_PATH + f'/Strategy_ml/{MODELS_FOLDER}/{TARGET}', [f'{TARGET}'])
 mode = 'mean'
 
 # models dir
-PROD_MODELS_DIR = BASE_PATH + '/Strategy_ml/models'
+PROD_MODELS_DIR = os.path.join(BASE_PATH, 'Strategy_ml\\models')
 

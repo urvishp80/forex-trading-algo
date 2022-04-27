@@ -36,13 +36,13 @@ class LightGBMModel:
         self.currency = currency
 
         if self.inference:
-            self._model = self.load(f'{self.config.MODELS_FOLDER}/{self.config.TARGET}/lgb_{self.currency}_{str(self.config.TARGET)}.txt')
+            self._model = self.load(f'{self.config.MODELS_FOLDER}\\{self.config.TARGET}\\lgb_{self.currency}_{str(self.config.TARGET)}.txt')
         else:
             self._model = None   # if self.config.saved_path is None else self.load(self.load(self.config.saved_path))
 
     def save(self):
-        os.makedirs(f'{self.config.MODELS_FOLDER}/{self.config.TARGET}/', exist_ok=True)
-        model_save_path = f'{self.config.MODELS_FOLDER}/{self.config.TARGET}/lgb_{self.currency}_{str(self.config.TARGET)}.txt'
+        os.makedirs(f'{self.config.MODELS_FOLDER}\\{self.config.TARGET}\\', exist_ok=True)
+        model_save_path = f'{self.config.MODELS_FOLDER}\\{self.config.TARGET}\\lgb_{self.currency}_{str(self.config.TARGET)}.txt'
         self._model.save_model(model_save_path)
         self.logger.info('Saved model to {}'.format(model_save_path))
 
@@ -74,7 +74,6 @@ class LightGBMModel:
 
     def predict(self, features):
         preds = self._model.predict(features)
-        print(preds)
         return preds
 
     def eval(self, features, labels, type):

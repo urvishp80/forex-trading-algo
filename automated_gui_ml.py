@@ -18,7 +18,6 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 
-
 # %%
 # stream live quotes
 class streamer(ttk.Frame):
@@ -170,6 +169,7 @@ class telegramBot(object):
                             text+=temp_text
 
         texts.append(text)
+        print(texts)
         for text in texts:
             bot.send_message(chat_id=chatID, text=text,
                              parse_mode=telegram.ParseMode.HTML)
@@ -287,8 +287,8 @@ class streamSignal(ttk.Frame):
         :params: None
         :Returntype: a list of last signal positions
         '''
-        self.pairs = self.path['instruments']
-        # self.pairs = self.path['instruments'].split(',')
+        # self.pairs = self.path['instruments']
+        self.pairs = self.path['instruments'].split(',')
         openPositions = []
         for st in self.pairs:
             # print(os.path.join(self.path['mainPath'],f"{self.path['predicted']}\\STRATEGY_{self.strategyEntry.get()}\\{self.timeframe}\\{st}" + ".csv"))
@@ -364,19 +364,11 @@ class streamSignal(ttk.Frame):
                 telegramBot(self.path).tgsignal(signal)
             else:
                 oldSignal = pd.read_csv(os.path.join(path['mainPath'], path['signals'] + '\\signals.csv'), index_col=False).iloc[:, 1:]
-                # oldSignal = oldSignal[['']]
                 print(f"oldsignal:{oldSignal}")
-                # print(f"openposition: {openPositions}")
                 newSignal = pd.DataFrame(openPositions, columns=columns)
                 if oldSignal['position'].equals(newSignal['position']):
-                    print("I think this is going in same old and update signal")
                     pass
                 else:
-                    # newSignal.sort_index().sort_index(axis=1, inplace=True)
-                    # oldSignal.sort_index().sort_index(axis=1, inplace=True)
-                    # oldSignal = oldSignal.reset_index(drop=True)
-                    # newSignal = newSignal.reset_index(drop=True)
-                    # print(newSignal)
                     newSignal['update'] = np.where(oldSignal['position'].sort_index(inplace=True) == newSignal['position'].sort_index(inplace=True), np.nan,
                                                    newSignal.position)
                     updateSignal = newSignal.dropna().drop(['update'], axis=1)
@@ -387,14 +379,13 @@ class streamSignal(ttk.Frame):
                     if len(updateSignal) > 0:
                         telegramBot(self.path).tgsignal(updateSignal)
                     # telegramBot(self.path).tgsignal(updateSignal)
-        print(openPositions)
         return openPositions
 
     def signalGUI(self):
         # Run automated signal
         self.strategy = str(self.strategyEntry.get())
-        self.pairs = self.path['instruments']
-        # self.pairs = self.path['instruments'].split(',')
+        # self.pairs = self.path['instruments']
+        self.pairs = self.path['instruments'].split(',')
         self.dev = int(self.deviationEntry.get())
         self.mul = int(self.multiplierEntry.get())
         self.period = int(self.periodEntry.get())
@@ -420,6 +411,7 @@ class streamSignal(ttk.Frame):
                                                     f"DATASETS\\{i}\\{i}_{self.timeframe}" + '.csv')
             # test_path = os.path.join('E:/urvish forex/forex-traading-algo/DATASETS/AUD_USD/AUD_USD_M2.csv')
             test_path_df = pd.read_csv(test_path)
+            print("#####################", len(test_path_df))
             if "close" in test_path_df.columns:
                 test_path_df = test_path_df
             else:
@@ -800,8 +792,8 @@ class Returns(ttk.Frame):
     def plotReturns(self):
         from collections import Counter
         returnplot = ttk.Frame(self)
-        # pairs = path['instruments'].split(',')
-        pairs = path['instruments']
+        pairs = path['instruments'].split(',')
+        # pairs = path['instruments']
         grabstrategy = str(self.strategyOption.get())
         grabtimeframe = str(self.timeOption.get())
         Framesort = tk.Frame(self)
@@ -860,8 +852,8 @@ class visu(ttk.Frame):
         style.map('TCombobox', fieldbackground=[('readonly', '#e3104f')])
         style.map('TCombobox', selectbackground=[('readonly', '#e3104f')])
         style.map('TCombobox', selectforeground=[('readonly', 'white')])
-        self.pairs = ttk.Combobox(optionFrame, values=self.path['instruments'], state='readonly')
-        # self.pairs = ttk.Combobox(optionFrame, values=self.path['instruments'].split(','), state='readonly')
+        # self.pairs = ttk.Combobox(optionFrame, values=self.path['instruments'], state='readonly')
+        self.pairs = ttk.Combobox(optionFrame, values=self.path['instruments'].split(','), state='readonly')
         # self.pairs.current(2)
         self.pairs.current(0)
         self.pairs.focus()
@@ -959,7 +951,7 @@ if __name__ == '__main__':
             'telegram': 'DOCS\\telegram.txt',
             'predicted': 'PREDICTED',
             'signals': 'SIGNALS',
-            'start': str((datetime.datetime.utcnow() - datetime.timedelta(days=2)).isoformat('T')[:-7] + 'Z'),
+            'start': str((datetime.datetime.utcnow() - datetime.timedelta(days=10)).isoformat('T')[:-7] + 'Z'),
             # 'start': str((datetime.datetime.utcnow() - datetime.timedelta(days=30)).isoformat('T')[:-7] + 'Z'),
             # '2019-10-03T00:00:00Z', # I changed this from match to oct
             'end': str(datetime.datetime.utcnow().isoformat('T')[:-7] + 'Z'),
@@ -968,11 +960,11 @@ if __name__ == '__main__':
                          '22', '33', '44', '55', '66', '77', '88', '99', '111',
                          '222', '333', '444', '555', '666', '777', '888', '999', '1111',
                          '2222', '3333', '4444', '5555', '6666', '7777', '8888'],
-            'instruments': ['AUD_USD'],
-            # 'instruments': 'AUD_USD,BCO_USD,BTC_USD,DE30_EUR,EUR_AUD,EUR_JPY,EUR_USD,GBP_JPY,GBP_USD,NAS100_USD,SPX500_USD,US30_USD,USD_CAD,USD_JPY,XAU_USD',
-            # 'timeframes': ['M30','M15' ,'H1', 'H2', 'H3', 'H4', 'H6', 'H8',
-            #                'H12', 'D', 'W']}
-            'timeframes': ['M2']}
+            # 'instruments': ['AUD_USD'],
+            'instruments': 'AUD_USD,BCO_USD,BTC_USD,DE30_EUR,EUR_AUD,EUR_JPY,EUR_USD,GBP_JPY,GBP_USD,NAS100_USD,SPX500_USD,US30_USD,USD_CAD,USD_JPY,XAU_USD',
+            'timeframes': ['M30','M15' ,'H1', 'H2', 'H3', 'H4', 'H6', 'H8',
+                           'H12', 'D', 'W']}
+            # 'timeframes': ['M30']}
     print('end time:')
     print(path['end'])
 

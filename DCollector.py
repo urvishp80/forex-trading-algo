@@ -146,9 +146,9 @@ class Runcollector:
         # if len(self.path['instruments']) == 1:
         #     self.path['instruments']
         # else:
-        for instr in self.path['instruments']:
-            print(instr)
-        # for instr in self.path['instruments'].split(','):
+        # for instr in self.path['instruments']:
+        #     print(instr)
+        for instr in self.path['instruments'].split(','):
             threads.append(Thread(target = stockDownload, args = (self.path, instr, self.start,
                                                                                    self.end, self.client, self.timeframe)))
         for trd in threads:

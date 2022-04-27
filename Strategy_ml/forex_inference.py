@@ -27,7 +27,8 @@ def forex_inference(currency, test_data_path):
     df = get_data(test_data_path, drop_col=config.TEST_DROP_COLS)
     print(len(df))
     print("##########################", df)
-    le = pickle.load(open(f"Strategy_ml/data/forex_{currency}_le.pkl", 'rb'))
+    le_path = os.path.join(config.BASE_PATH, f"Strategy_ml\\data\\forex_{currency}_le.pkl")
+    le = pickle.load(open(le_path, 'rb'))
     # df['Position_final'] = le.transform(df['Position_final'])
     # log.info(f"Getting indicator for data of {currency} currency.")
     # df = df.drop("Position_final", axis=1)
@@ -40,7 +41,8 @@ def forex_inference(currency, test_data_path):
     data = merge_data(df, df_indicators, df_price_pattern, df_add_indicators, test=True)
     print(data.head())
     print(len(data))
-    with open(f"Strategy_ml/data/{currency}_IMP_FEATURES.txt", 'r') as f:
+    imp_features_path = os.path.join(config.BASE_PATH, f"Strategy_ml\\data\\{currency}_IMP_FEATURES.txt")
+    with open(imp_features_path, 'r') as f:
         fe_names = [line.rstrip('\n') for line in f]
     features_names = fe_names
     # features_names = config.test_fe_names
@@ -76,7 +78,6 @@ def forex_inference(currency, test_data_path):
     df = df.iloc[n:, :]
     df.rename(columns={"Date":"timestamp"}, inplace=True)
     df_current = df.copy()
-    print(df_current)
     df_current = df_current[["timestamp", "open", "high", "low", "close", "pred_class"]]
     df_current.rename(columns={"open":"Open", "high":"High", "low":"Low", "close":"Close", "pred_class":"Position"}, inplace=True)
 
