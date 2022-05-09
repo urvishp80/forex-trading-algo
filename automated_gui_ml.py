@@ -369,15 +369,24 @@ class streamSignal(ttk.Frame):
                 if oldSignal['position'].equals(newSignal['position']):
                     pass
                 else:
-                    newSignal['update'] = np.where(oldSignal['position'].sort_index(inplace=True) == newSignal['position'].sort_index(inplace=True), np.nan,
-                                                   newSignal.position)
+                    # newSignal['update'] = np.where(oldSignal['position'].sort_index(inplace=True) == newSignal['position'].sort_index(inplace=True), np.nan,
+                    #                                newSignal.position)
+                    newSignal['update'] = np.where(
+                        newSignal['position'] == oldSignal['position'], np.nan, newSignal.position)
+
+                    print(newSignal['update'])
                     updateSignal = newSignal.dropna().drop(['update'], axis=1)
                     newSignal.drop(['update'], axis=1, inplace=True)
                     newSignal.to_csv(os.path.join(path['mainPath'], path['signals'] + '\\signals.csv'), index=False)
                     # --Return telegram
+                    # updated = pd.concat([newSignal, oldSignal]).drop_duplicates(keep=False)
+                    # print(f"updated {updated}")
+
                     print(f"updatesignal {updateSignal}")
-                    if len(updateSignal) > 0:
-                        telegramBot(self.path).tgsignal(updateSignal)
+                    print(f"newsignal {newSignal}")
+                    # if len(updateSignal) > 0:
+                    telegramBot(self.path).tgsignal(updateSignal)
+                    # telegramBot(self.path).tgsignal(newSignal)
                     # telegramBot(self.path).tgsignal(updateSignal)
         return openPositions
 
@@ -962,7 +971,7 @@ if __name__ == '__main__':
                          '2222', '3333', '4444', '5555', '6666', '7777', '8888'],
             # 'instruments': ['AUD_USD'],
             'instruments': 'AUD_USD,BCO_USD,BTC_USD,DE30_EUR,EUR_AUD,EUR_JPY,EUR_USD,GBP_JPY,GBP_USD,NAS100_USD,SPX500_USD,US30_USD,USD_CAD,USD_JPY,XAU_USD',
-            'timeframes': ['M30','M15' ,'H1', 'H2', 'H3', 'H4', 'H6', 'H8',
+            'timeframes': ['M15','M30' ,'H1', 'H2', 'H3', 'H4', 'H6', 'H8',
                            'H12', 'D', 'W']}
             # 'timeframes': ['M30']}
     print('end time:')

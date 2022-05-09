@@ -369,15 +369,18 @@ class streamSignal(ttk.Frame):
                 print("I think this is going in same old and update signal")
                 pass
             else:
-                newSignal['update'] = np.where(oldSignal['position'].sort_index(inplace=True) == newSignal['position'].sort_index(inplace=True), np.nan,
-                                               newSignal.position)
+                # newSignal['update'] = np.where(oldSignal['position'].sort_index(inplace=True) == newSignal['position'].sort_index(inplace=True), np.nan,
+                #                                newSignal.position)
+                newSignal['update'] = np.where(
+                    newSignal['position'] == oldSignal['position'], np.nan, newSignal.position)
                 updateSignal = newSignal.dropna().drop(['update'], axis=1)
                 newSignal.drop(['update'], axis=1, inplace=True)
                 newSignal.to_csv(os.path.join(path['mainPath'], path['signals'] + '\\signals_old_gui.csv'), index=False)
                 # --Return telegram
                 print(f"updatesignal {updateSignal}")
-                if len(updateSignal) > 0:
-                    telegramBot(self.path).tgsignal(updateSignal)
+                # if len(updateSignal) > 0:
+                telegramBot(self.path).tgsignal(updateSignal)
+                # telegramBot(self.path).tgsignal(newSignal)
         return openPositions
 
     def signalGUI(self):
@@ -2992,7 +2995,7 @@ if __name__ == '__main__':
                          '222', '333', '444', '555', '666', '777', '888', '999', '1111',
                          '2222', '3333', '4444', '5555', '6666', '7777', '8888'],
             'instruments': 'AUD_USD,BCO_USD,BTC_USD,DE30_EUR,EUR_AUD,EUR_JPY,EUR_USD,GBP_JPY,GBP_USD,NAS100_USD,SPX500_USD,US30_USD,USD_CAD,USD_JPY,XAU_USD',
-            'timeframes': ['M2','M30','H1', 'H2', 'H3', 'H4', 'H6', 'H8',
+            'timeframes': ['M15','M30','H1', 'H2', 'H3', 'H4', 'H6', 'H8',
                            'H12', 'D', 'W']}
             # 'timeframes': ['M30']}
     print('end time:')
